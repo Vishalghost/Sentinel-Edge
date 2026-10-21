@@ -1,6 +1,6 @@
 """Copy STRANDS_DECIDER_API_KEY from .env into the deployed DeciderApiKey secret (run after cdk deploy).
 
-  python scripts/set_decider_key.py            # verifies the key against the hosted API first
+  python scripts/set_decider_key.py            # verifies the key with one real call first (spends 1 answer)
   python scripts/set_decider_key.py --no-check
 
 The key is read from .env or the environment and never printed.
@@ -34,8 +34,10 @@ def main() -> None:
         client = DeciderClient(api_key=key)
         if any(h in client.url for h in ("127.0.0.1", "localhost")):
             sys.exit("STRANDS_DECIDER_URL points at a local server; set it to the hosted API URL in .env.")
-        if not client.health():
-            sys.exit(f"The hosted API rejected the key or is down ({client.url}/v1/models). Secret not updated.")
+        try:  # GET /v1/models answers 200 even for a wrong key, so spend 1 answer on a real call
+            client.noul("key check", "Is this a key check?")
+        except Exception as e:
+            sys.exit(f"The hosted API rejected the key or is down ({client.url}): {e}. Secret not updated.")
 
     outputs = boto3.client("cloudformation", region_name=args.region).describe_stacks(StackName=STACK)["Stacks"][0]["Outputs"]
     arn = next(o["OutputValue"] for o in outputs if o["OutputKey"] == "DeciderApiKeySecret")
