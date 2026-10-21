@@ -1,0 +1,4 @@
+{
+  "app": "..\\.venv-win\\Scripts\\python.exe app.py",
+  "context": {}
+}

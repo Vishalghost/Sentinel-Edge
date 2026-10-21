@@ -1,0 +1,16 @@
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+cdk.out/
+node_modules/
+certs/
+*.pem
+*.key
+.env
+.setup_uv.sh
+.serve.sh
+.health.sh
+.probe.sh
+Untitled Diagram.drawio
+infra/cdk.context.json

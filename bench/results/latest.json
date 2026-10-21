@@ -1,0 +1,1525 @@
+{
+  "generated": "2026-10-21 15:13",
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "price_assumption_usd_per_mtok": {
+    "input": 0.8,
+    "output": 3.2
+  },
+  "decider_hardware": "laptop RTX 4050 (WSL2)",
+  "gated": {
+    "alarms": 49,
+    "category_accuracy": 0.816,
+    "accuracy_by_profile": {
+      "bottling_line": 0.8,
+      "discrete_assembly": 0.786,
+      "process_plant": 0.85
+    },
+    "safety_recall_category": "4/5",
+    "safety_surfaced": "5/5",
+    "real_alarms_hidden": 0,
+    "operator_load_cut": 0.49,
+    "decision_ms_p50": 955,
+    "decision_ms_p95": 1146,
+    "llm_calls": 11,
+    "tokens_in": 3326,
+    "tokens_out": 783,
+    "llm_cost_usd": 0.0052,
+    "llm_cost_per_1k_alarms_usd": 0.11
+  },
+  "llm_only": {
+    "alarms": 49,
+    "category_accuracy": 0.816,
+    "accuracy_by_profile": {
+      "bottling_line": 0.8,
+      "discrete_assembly": 0.786,
+      "process_plant": 0.85
+    },
+    "safety_recall_category": "5/5",
+    "safety_surfaced": "5/5",
+    "real_alarms_hidden": 0,
+    "operator_load_cut": 0.653,
+    "decision_ms_p50": 1695,
+    "decision_ms_p95": 2638,
+    "llm_calls": 49,
+    "tokens_in": 42828,
+    "tokens_out": 7255,
+    "llm_cost_usd": 0.0575,
+    "llm_cost_per_1k_alarms_usd": 1.17
+  },
+  "rows": {
+    "gated": [
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1145.86,
+        "signals": {
+          "danger": 0.163,
+          "noise": 0.9348,
+          "consequence": 0.2529,
+          "maintenance": 0.2427
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "CIP-COND",
+        "expected": "nuisance",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 937.74,
+        "signals": {
+          "danger": 0.2428,
+          "noise": 0.2275,
+          "consequence": 0.3287,
+          "maintenance": 0.2432
+        },
+        "llm_calls": 1,
+        "tokens_in": 245,
+        "tokens_out": 58
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "TT-PAST-LO",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 934.77,
+        "signals": {
+          "danger": 0.7499,
+          "noise": 0.1721,
+          "consequence": 0.3592,
+          "maintenance": 0.1807
+        },
+        "llm_calls": 1,
+        "tokens_in": 281,
+        "tokens_out": 50
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "FDV-DIVERT",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 924.07,
+        "signals": {
+          "danger": 0.3288,
+          "noise": 0.1896,
+          "consequence": 0.5062,
+          "maintenance": 0.2023
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LT-BUF-LO",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 993.53,
+        "signals": {
+          "danger": 0.216,
+          "noise": 0.1833,
+          "consequence": 0.4302,
+          "maintenance": 0.1944
+        },
+        "llm_calls": 1,
+        "tokens_in": 370,
+        "tokens_out": 86
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 943.9200000000001,
+        "signals": {
+          "danger": 0.163,
+          "noise": 0.9348,
+          "consequence": 0.5282,
+          "maintenance": 0.2427
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "FIL-STARVED",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 1008.67,
+        "signals": {
+          "danger": 0.2431,
+          "noise": 0.2135,
+          "consequence": 0.5463,
+          "maintenance": 0.203
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "PAL-IDLE",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 898.32,
+        "signals": {
+          "danger": 0.11,
+          "noise": 0.2929,
+          "consequence": 0.4851,
+          "maintenance": 0.2167
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 976.8199999999999,
+        "signals": {
+          "danger": 0.163,
+          "noise": 0.9348,
+          "consequence": 0.5471,
+          "maintenance": 0.2427
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 925.76,
+        "signals": {
+          "danger": 0.163,
+          "noise": 0.9348,
+          "consequence": 0.2079,
+          "maintenance": 0.143
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "FIL-JAM",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1097.85,
+        "signals": {
+          "danger": 0.1909,
+          "noise": 0.2365,
+          "consequence": 0.3187,
+          "maintenance": 0.1582
+        },
+        "llm_calls": 1,
+        "tokens_in": 203,
+        "tokens_out": 91
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "CHK-UNDER",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 947.4,
+        "signals": {
+          "danger": 0.1886,
+          "noise": 0.2108,
+          "consequence": 0.5143,
+          "maintenance": 0.1389
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 947.98,
+        "signals": {
+          "danger": 0.163,
+          "noise": 0.9348,
+          "consequence": 0.5831,
+          "maintenance": 0.143
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "GD-OPEN",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 968.8199999999999,
+        "signals": {
+          "danger": 0.6734,
+          "noise": 0.2409,
+          "consequence": 0.3572,
+          "maintenance": 0.1376
+        },
+        "llm_calls": 1,
+        "tokens_in": 264,
+        "tokens_out": 64
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "CAP-TORQUE",
+        "expected": "actionable",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 1144.88,
+        "signals": {
+          "danger": 0.2479,
+          "noise": 0.1967,
+          "consequence": 0.5377,
+          "maintenance": 0.1427
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1071.15,
+        "signals": {
+          "danger": 0.1553,
+          "noise": 0.9335,
+          "consequence": 0.2024,
+          "maintenance": 0.2376
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "RB-42-SVC",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 891.39,
+        "signals": {
+          "danger": 0.1489,
+          "noise": 0.274,
+          "consequence": 0.4961,
+          "maintenance": 0.9051
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "WC-41-FLOW",
+        "expected": "actionable",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 921.47,
+        "signals": {
+          "danger": 0.1797,
+          "noise": 0.1973,
+          "consequence": 0.4703,
+          "maintenance": 0.2675
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "WC-41-TEMP",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 955.25,
+        "signals": {
+          "danger": 0.1711,
+          "noise": 0.1592,
+          "consequence": 0.5156,
+          "maintenance": 0.2426
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "RB-41-FLT",
+        "expected": "duplicate_of_active",
+        "category": "nuisance",
+        "route": "review",
+        "decision_ms": 940.31,
+        "signals": {
+          "danger": 0.2183,
+          "noise": 0.1769,
+          "consequence": 0.5457,
+          "maintenance": 0.5578
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 944.45,
+        "signals": {
+          "danger": 0.1553,
+          "noise": 0.9335,
+          "consequence": 0.6397,
+          "maintenance": 0.2376
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-NG",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1079.2,
+        "signals": {
+          "danger": 0.1642,
+          "noise": 0.2223,
+          "consequence": 0.6235,
+          "maintenance": 0.2871
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "CNV-40-HOLD",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 1083.61,
+        "signals": {
+          "danger": 0.1678,
+          "noise": 0.2434,
+          "consequence": 0.49,
+          "maintenance": 0.3181
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 876.11,
+        "signals": {
+          "danger": 0.1553,
+          "noise": 0.9335,
+          "consequence": 0.1737,
+          "maintenance": 0.1505
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "AIR-40-LO",
+        "expected": "actionable",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 903.79,
+        "signals": {
+          "danger": 0.1927,
+          "noise": 0.1995,
+          "consequence": 0.4585,
+          "maintenance": 0.1482
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "PR-44-PRESS",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 909.1299999999999,
+        "signals": {
+          "danger": 0.2031,
+          "noise": 0.1724,
+          "consequence": 0.7405,
+          "maintenance": 0.1657
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 967.64,
+        "signals": {
+          "danger": 0.1553,
+          "noise": 0.9335,
+          "consequence": 0.6907,
+          "maintenance": 0.1505
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "LC-40-BREAK",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 965.8199999999999,
+        "signals": {
+          "danger": 0.8747,
+          "noise": 0.21,
+          "consequence": 0.3822,
+          "maintenance": 0.1864
+        },
+        "llm_calls": 1,
+        "tokens_in": 261,
+        "tokens_out": 70
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "CNV-40-HOLD",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1012.4100000000001,
+        "signals": {
+          "danger": 0.1678,
+          "noise": 0.2434,
+          "consequence": 0.603,
+          "maintenance": 0.1605
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 948.29,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.2062,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-108-DEV",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 907.1299999999999,
+        "signals": {
+          "danger": 0.1368,
+          "noise": 0.138,
+          "consequence": 0.2476,
+          "maintenance": 0.8471
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "FI-301-LO",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 852.13,
+        "signals": {
+          "danger": 0.2666,
+          "noise": 0.216,
+          "consequence": 0.3186,
+          "maintenance": 0.2127
+        },
+        "llm_calls": 1,
+        "tokens_in": 223,
+        "tokens_out": 76
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-302-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1201.0,
+        "signals": {
+          "danger": 0.2726,
+          "noise": 0.1822,
+          "consequence": 0.5518,
+          "maintenance": 0.1865
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1022.86,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.4196,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-204-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 949.6599999999999,
+        "signals": {
+          "danger": 0.2801,
+          "noise": 0.1339,
+          "consequence": 0.6061,
+          "maintenance": 0.2013
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LI-203-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 994.23,
+        "signals": {
+          "danger": 0.1543,
+          "noise": 0.1353,
+          "consequence": 0.6074,
+          "maintenance": 0.2313
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "PI-205-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 940.9100000000001,
+        "signals": {
+          "danger": 0.4274,
+          "noise": 0.1388,
+          "consequence": 0.5201,
+          "maintenance": 0.2242
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 942.3699999999999,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.4176,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "PSV-205-OPEN",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 944.28,
+        "signals": {
+          "danger": 0.7744,
+          "noise": 0.135,
+          "consequence": 0.4834,
+          "maintenance": 0.2109
+        },
+        "llm_calls": 1,
+        "tokens_in": 552,
+        "tokens_out": 96
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "AT-310-HI",
+        "expected": "safety_critical",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 1099.1299999999999,
+        "signals": {
+          "danger": 0.4505,
+          "noise": 0.1598,
+          "consequence": 0.5146,
+          "maintenance": 0.237
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1030.45,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.4788,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "TI-108-DEV",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 936.0,
+        "signals": {
+          "danger": 0.1368,
+          "noise": 0.138,
+          "consequence": 0.1564,
+          "maintenance": 0.8471
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "MS-101-TRIP",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 897.7,
+        "signals": {
+          "danger": 0.1728,
+          "noise": 0.1508,
+          "consequence": 0.3264,
+          "maintenance": 0.2997
+        },
+        "llm_calls": 1,
+        "tokens_in": 215,
+        "tokens_out": 60
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "FI-101-LO",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1047.91,
+        "signals": {
+          "danger": 0.2014,
+          "noise": 0.1731,
+          "consequence": 0.4067,
+          "maintenance": 0.2623
+        },
+        "llm_calls": 1,
+        "tokens_in": 248,
+        "tokens_out": 90
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "PI-101-LO",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 971.6600000000001,
+        "signals": {
+          "danger": 0.1913,
+          "noise": 0.1432,
+          "consequence": 0.461,
+          "maintenance": 0.2321
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 972.94,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.2998,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "TI-201-LO",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "review",
+        "decision_ms": 1049.43,
+        "signals": {
+          "danger": 0.1898,
+          "noise": 0.1232,
+          "consequence": 0.4973,
+          "maintenance": 0.3291
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LI-201-LO",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 982.0,
+        "signals": {
+          "danger": 0.1381,
+          "noise": 0.1333,
+          "consequence": 0.3747,
+          "maintenance": 0.2497
+        },
+        "llm_calls": 1,
+        "tokens_in": 464,
+        "tokens_out": 42
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1312.47,
+        "signals": {
+          "danger": 0.136,
+          "noise": 0.9262,
+          "consequence": 0.349,
+          "maintenance": 0.2305
+        },
+        "llm_calls": 0,
+        "tokens_in": 0,
+        "tokens_out": 0
+      }
+    ],
+    "llm_only": [
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1543.9898000331596,
+        "llm_calls": 1,
+        "tokens_in": 776,
+        "tokens_out": 107
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "CIP-COND",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 2191.263299959246,
+        "llm_calls": 1,
+        "tokens_in": 803,
+        "tokens_out": 155
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "TT-PAST-LO",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1951.26679999521,
+        "llm_calls": 1,
+        "tokens_in": 839,
+        "tokens_out": 161
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "FDV-DIVERT",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1752.755499968771,
+        "llm_calls": 1,
+        "tokens_in": 870,
+        "tokens_out": 148
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LT-BUF-LO",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 2234.3370000016876,
+        "llm_calls": 1,
+        "tokens_in": 928,
+        "tokens_out": 188
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1740.9853999852203,
+        "llm_calls": 1,
+        "tokens_in": 920,
+        "tokens_out": 135
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "FIL-STARVED",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1651.7672999761999,
+        "llm_calls": 1,
+        "tokens_in": 986,
+        "tokens_out": 150
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "PAL-IDLE",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 2655.648600019049,
+        "llm_calls": 1,
+        "tokens_in": 974,
+        "tokens_out": 213
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "pasteuriser_underheat",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1993.6859000008553,
+        "llm_calls": 1,
+        "tokens_in": 1022,
+        "tokens_out": 147
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1433.2035999977961,
+        "llm_calls": 1,
+        "tokens_in": 747,
+        "tokens_out": 109
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "FIL-JAM",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 2096.928500046488,
+        "llm_calls": 1,
+        "tokens_in": 761,
+        "tokens_out": 139
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "CHK-UNDER",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 2378.071599989198,
+        "llm_calls": 1,
+        "tokens_in": 826,
+        "tokens_out": 203
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "LAB-GAP",
+        "expected": "nuisance",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1604.3091000174172,
+        "llm_calls": 1,
+        "tokens_in": 850,
+        "tokens_out": 120
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "GD-OPEN",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1503.0225000227802,
+        "llm_calls": 1,
+        "tokens_in": 822,
+        "tokens_out": 146
+      },
+      {
+        "profile": "bottling_line",
+        "scenario": "filler_jam_guard",
+        "tag": "CAP-TORQUE",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1714.8283999995328,
+        "llm_calls": 1,
+        "tokens_in": 944,
+        "tokens_out": 154
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1449.268700031098,
+        "llm_calls": 1,
+        "tokens_in": 787,
+        "tokens_out": 135
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "RB-42-SVC",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1596.9414999708533,
+        "llm_calls": 1,
+        "tokens_in": 838,
+        "tokens_out": 156
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "WC-41-FLOW",
+        "expected": "actionable",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1451.183299999684,
+        "llm_calls": 1,
+        "tokens_in": 835,
+        "tokens_out": 130
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "WC-41-TEMP",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1798.649000003934,
+        "llm_calls": 1,
+        "tokens_in": 867,
+        "tokens_out": 126
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "RB-41-FLT",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1769.1280000144616,
+        "llm_calls": 1,
+        "tokens_in": 975,
+        "tokens_out": 156
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1477.7390999952331,
+        "llm_calls": 1,
+        "tokens_in": 1004,
+        "tokens_out": 142
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "VIS-43-NG",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1695.484799973201,
+        "llm_calls": 1,
+        "tokens_in": 1021,
+        "tokens_out": 160
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "weld_cooling_loss",
+        "tag": "CNV-40-HOLD",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1765.4394999844953,
+        "llm_calls": 1,
+        "tokens_in": 1094,
+        "tokens_out": 182
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1482.952499995008,
+        "llm_calls": 1,
+        "tokens_in": 761,
+        "tokens_out": 116
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "AIR-40-LO",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1858.0635999678634,
+        "llm_calls": 1,
+        "tokens_in": 765,
+        "tokens_out": 165
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "PR-44-PRESS",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 2452.4509999901056,
+        "llm_calls": 1,
+        "tokens_in": 809,
+        "tokens_out": 240
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "VIS-43-LIGHT",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1384.802300017327,
+        "llm_calls": 1,
+        "tokens_in": 881,
+        "tokens_out": 117
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "LC-40-BREAK",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1479.9162999843247,
+        "llm_calls": 1,
+        "tokens_in": 815,
+        "tokens_out": 123
+      },
+      {
+        "profile": "discrete_assembly",
+        "scenario": "air_drop_light_curtain",
+        "tag": "CNV-40-HOLD",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1797.6040999637917,
+        "llm_calls": 1,
+        "tokens_in": 949,
+        "tokens_out": 160
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1464.4749000435695,
+        "llm_calls": 1,
+        "tokens_in": 726,
+        "tokens_out": 122
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-108-DEV",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1484.1815000399947,
+        "llm_calls": 1,
+        "tokens_in": 777,
+        "tokens_out": 95
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "FI-301-LO",
+        "expected": "actionable",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1394.4124999688938,
+        "llm_calls": 1,
+        "tokens_in": 0,
+        "tokens_out": 0
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-302-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1420.4473000136204,
+        "llm_calls": 1,
+        "tokens_in": 853,
+        "tokens_out": 135
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1623.7934000091627,
+        "llm_calls": 1,
+        "tokens_in": 857,
+        "tokens_out": 126
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "TI-204-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1726.7282999819145,
+        "llm_calls": 1,
+        "tokens_in": 948,
+        "tokens_out": 155
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LI-203-HI",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1800.0977999763563,
+        "llm_calls": 1,
+        "tokens_in": 972,
+        "tokens_out": 170
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "PI-205-HI",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 1785.5215999879874,
+        "llm_calls": 1,
+        "tokens_in": 1041,
+        "tokens_out": 185
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1360.7407999807037,
+        "llm_calls": 1,
+        "tokens_in": 985,
+        "tokens_out": 106
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "PSV-205-OPEN",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 2702.179400017485,
+        "llm_calls": 1,
+        "tokens_in": 1108,
+        "tokens_out": 160
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "AT-310-HI",
+        "expected": "safety_critical",
+        "category": "safety_critical",
+        "route": "escalate",
+        "decision_ms": 1646.1956000421196,
+        "llm_calls": 1,
+        "tokens_in": 1038,
+        "tokens_out": 132
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "cooling_failure_cascade",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1280.4186000139453,
+        "llm_calls": 1,
+        "tokens_in": 1095,
+        "tokens_out": 125
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "TI-108-DEV",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1431.2310999957845,
+        "llm_calls": 1,
+        "tokens_in": 747,
+        "tokens_out": 96
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "MS-101-TRIP",
+        "expected": "actionable",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 2637.940599990543,
+        "llm_calls": 1,
+        "tokens_in": 773,
+        "tokens_out": 295
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "FI-101-LO",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1475.8535000146367,
+        "llm_calls": 1,
+        "tokens_in": 806,
+        "tokens_out": 130
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "PI-101-LO",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 1860.7385999639519,
+        "llm_calls": 1,
+        "tokens_in": 843,
+        "tokens_out": 183
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1413.6037999996915,
+        "llm_calls": 1,
+        "tokens_in": 852,
+        "tokens_out": 120
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "TI-201-LO",
+        "expected": "duplicate_of_active",
+        "category": "duplicate_of_active",
+        "route": "suppress",
+        "decision_ms": 2004.313200013712,
+        "llm_calls": 1,
+        "tokens_in": 964,
+        "tokens_out": 183
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LI-201-LO",
+        "expected": "duplicate_of_active",
+        "category": "actionable",
+        "route": "escalate",
+        "decision_ms": 2541.140599991195,
+        "llm_calls": 1,
+        "tokens_in": 1026,
+        "tokens_out": 228
+      },
+      {
+        "profile": "process_plant",
+        "scenario": "feed_pump_trip",
+        "tag": "LSH-305",
+        "expected": "nuisance",
+        "category": "nuisance",
+        "route": "suppress",
+        "decision_ms": 1562.516899954062,
+        "llm_calls": 1,
+        "tokens_in": 948,
+        "tokens_out": 126
+      }
+    ]
+  }
+}

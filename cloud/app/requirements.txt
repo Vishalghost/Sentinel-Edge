@@ -1,0 +1,6 @@
+fastapi==0.120.*
+uvicorn[standard]
+strands-agents==1.61.1
+boto3
+pyyaml
+pydantic>=2

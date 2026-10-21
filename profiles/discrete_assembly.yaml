@@ -1,0 +1,67 @@
+profile_id: discrete_assembly
+display_name: "Body-in-White Weld Cell 4"
+industry: "Automotive discrete assembly"
+description: >
+  Robotic body-shop cell: a conveyor indexes car bodies into a weld station where two
+  robots spot-weld, a vision system inspects the welds, and a press station fits doors.
+  A light curtain protects the operator load station.
+
+areas:
+  CELL-4A: "Load station"
+  CELL-4B: "Weld station"
+  CELL-4C: "Inspection & door press"
+
+equipment:
+  CNV-40: {type: "indexing conveyor", area: CELL-4A, feeds: [RB-41, RB-42]}
+  LC-40:  {type: "safety light curtain, load station", area: CELL-4A, feeds: []}
+  RB-41:  {type: "spot-weld robot (left)", area: CELL-4B, feeds: [VIS-43]}
+  RB-42:  {type: "spot-weld robot (right)", area: CELL-4B, feeds: [VIS-43]}
+  WC-41:  {type: "weld controller / water chiller", area: CELL-4B, feeds: [RB-41, RB-42]}
+  VIS-43: {type: "weld vision inspection", area: CELL-4C, feeds: [PR-44]}
+  PR-44:  {type: "door press", area: CELL-4C, feeds: []}
+  AIR-40: {type: "compressed air header", area: CELL-4A, feeds: [PR-44, CNV-40]}
+
+alarm_catalog:
+  LC-40-BREAK: {equipment: LC-40, priority: critical, text: "Light curtain broken while robots in automatic"}
+  WC-41-FLOW:  {equipment: WC-41, priority: high, text: "Weld gun cooling water flow low"}
+  WC-41-TEMP:  {equipment: WC-41, priority: medium, text: "Weld cooling water temperature high"}
+  RB-41-FLT:   {equipment: RB-41, priority: high, text: "RB-41 weld fault: tip overheat"}
+  RB-42-FLT:   {equipment: RB-42, priority: high, text: "RB-42 weld fault: tip overheat"}
+  VIS-43-NG:   {equipment: VIS-43, priority: medium, text: "Vision: weld spot count NG on last body"}
+  CNV-40-HOLD: {equipment: CNV-40, priority: low, text: "Conveyor index held - downstream not ready"}
+  PR-44-PRESS: {equipment: PR-44, priority: high, text: "Door press hydraulic pressure low"}
+  AIR-40-LO:   {equipment: AIR-40, priority: medium, text: "Compressed air header pressure low"}
+  VIS-43-LIGHT: {equipment: VIS-43, priority: low, text: "Vision lighting intensity drift", chattering: true}
+  RB-42-SVC:   {equipment: RB-42, priority: low, text: "RB-42 servo amplifier warning"}
+
+decision:
+  signals:
+    danger: "Does the NEW alarm itself signal an immediate hazard to people or equipment, such as a broken safety light curtain or guard while robots run, fire, or a crushing risk?"
+    consequence: "Is the NEW alarm most likely a downstream consequence of an alarm that is ALREADY ACTIVE on the same or connected equipment?"
+    noise: "Is the NEW alarm a chattering or nuisance alarm that repeats without any real process change?"
+    maintenance: "According to the operator log, is the equipment of the NEW alarm isolated, locked out or under maintenance right now?"
+
+scenarios:
+  - id: weld_cooling_loss
+    title: "Weld cooling water fails -> both robots fault -> bad welds"
+    oplog:
+      - "06:10 Maintenance: RB-42 servo amplifier being replaced, robot locked out, running on RB-41 only"
+    events:
+      - {t: 0.0, tag: VIS-43-LIGHT, expected: nuisance}
+      - {t: 1.0, tag: RB-42-SVC, expected: nuisance}
+      - {t: 2.5, tag: WC-41-FLOW, expected: actionable}
+      - {t: 3.5, tag: WC-41-TEMP, expected: duplicate_of_active}
+      - {t: 5.0, tag: RB-41-FLT, expected: duplicate_of_active}
+      - {t: 6.0, tag: VIS-43-LIGHT, expected: nuisance}
+      - {t: 7.0, tag: VIS-43-NG, expected: duplicate_of_active}
+      - {t: 8.5, tag: CNV-40-HOLD, expected: duplicate_of_active}
+  - id: air_drop_light_curtain
+    title: "Air header drops, then the light curtain is broken at the load station"
+    oplog: []
+    events:
+      - {t: 0.0, tag: VIS-43-LIGHT, expected: nuisance}
+      - {t: 1.5, tag: AIR-40-LO, expected: actionable}
+      - {t: 3.0, tag: PR-44-PRESS, expected: duplicate_of_active}
+      - {t: 4.5, tag: VIS-43-LIGHT, expected: nuisance}
+      - {t: 6.0, tag: LC-40-BREAK, expected: safety_critical}
+      - {t: 7.0, tag: CNV-40-HOLD, expected: duplicate_of_active}

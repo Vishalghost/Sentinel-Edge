@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Run a command inside the WSL edge venv from the repo root:  bash scripts/wsl.sh python -m edge.local_run ...
+cd /mnt/d/strands && . ~/strands/.venv/bin/activate && export PYTHONUNBUFFERED=1 && "$@"

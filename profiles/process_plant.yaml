@@ -1,0 +1,79 @@
+profile_id: process_plant
+display_name: "Solvent Recovery Unit"
+industry: "Chemical process plant"
+description: >
+  Continuous solvent recovery: feed pumps send spent solvent through a preheater
+  into a distillation column; a cooling-water loop serves the condenser.
+
+areas:
+  AREA-100: "Feed & Pumping"
+  AREA-200: "Distillation"
+  AREA-300: "Cooling Water & Utilities"
+
+equipment:
+  P-101: {type: "feed pump (duty)", area: AREA-100, feeds: [E-201]}
+  P-102: {type: "feed pump (standby)", area: AREA-100, feeds: [E-201]}
+  E-201: {type: "feed preheater", area: AREA-200, feeds: [C-201]}
+  C-201: {type: "distillation column", area: AREA-200, feeds: [E-202]}
+  E-202: {type: "overhead condenser", area: AREA-200, feeds: [V-203]}
+  V-203: {type: "reflux drum", area: AREA-200, feeds: []}
+  P-301: {type: "cooling water pump", area: AREA-300, feeds: [E-202]}
+  V-305: {type: "condensate pot", area: AREA-300, feeds: []}
+  AT-310: {type: "solvent vapour analyser (LEL)", area: AREA-200, feeds: []}
+
+alarm_catalog:
+  FI-101-LO:  {equipment: P-101, priority: high,   text: "P-101 discharge flow low"}
+  PI-101-LO:  {equipment: P-101, priority: medium, text: "P-101 discharge pressure low"}
+  MS-101-TRIP: {equipment: P-101, priority: high,  text: "P-101 motor tripped"}
+  TI-201-LO:  {equipment: E-201, priority: medium, text: "E-201 feed outlet temperature low"}
+  LI-201-LO:  {equipment: C-201, priority: medium, text: "C-201 sump level low"}
+  TI-204-HI:  {equipment: C-201, priority: high,   text: "C-201 top temperature high"}
+  PI-205-HI:  {equipment: C-201, priority: high,   text: "C-201 column pressure high"}
+  FI-301-LO:  {equipment: P-301, priority: high,   text: "Cooling water flow to E-202 low"}
+  TI-302-HI:  {equipment: E-202, priority: high,   text: "E-202 condenser outlet temperature high"}
+  PSV-205-OPEN: {equipment: C-201, priority: critical, text: "C-201 relief valve PSV-205 lifting"}
+  AT-310-HI:  {equipment: AT-310, priority: critical, text: "Solvent vapour at 25% LEL near C-201"}
+  LSH-305:    {equipment: V-305, priority: low, text: "V-305 level switch high", chattering: true}
+  TI-108-DEV: {equipment: P-102, priority: low, text: "P-102 bearing temperature deviation"}
+  LI-203-HI:  {equipment: V-203, priority: medium, text: "V-203 reflux drum level high"}
+
+decision:
+  # Yes/no signals Decider answers about each alarm, all in ONE request.
+  # alarm_triage/router.py combines them into a category and a route.
+  signals:
+    danger: "Does the NEW alarm itself signal an immediate hazard to people or equipment, such as a relief valve lifting, flammable gas, fire or overpressure?"
+    consequence: "Is the NEW alarm most likely a downstream consequence of an alarm that is ALREADY ACTIVE on the same or connected equipment?"
+    noise: "Is the NEW alarm a chattering or nuisance alarm that repeats without any real process change?"
+    maintenance: "According to the operator log, is the equipment of the NEW alarm isolated or under maintenance right now?"
+
+scenarios:
+  - id: cooling_failure_cascade
+    title: "Cooling-water pump trips -> condenser and column cascade"
+    oplog:
+      - "06:40 Maintenance: P-102 standby feed pump isolated for seal replacement until 14:00"
+    events:
+      - {t: 0.0, tag: LSH-305, expected: nuisance}
+      - {t: 1.5, tag: TI-108-DEV, expected: nuisance}
+      - {t: 3.0, tag: FI-301-LO, expected: actionable}
+      - {t: 4.0, tag: TI-302-HI, expected: duplicate_of_active}
+      - {t: 5.0, tag: LSH-305, expected: nuisance}
+      - {t: 6.0, tag: TI-204-HI, expected: duplicate_of_active}
+      - {t: 7.0, tag: LI-203-HI, expected: duplicate_of_active}
+      - {t: 8.0, tag: PI-205-HI, expected: duplicate_of_active}
+      - {t: 9.0, tag: LSH-305, expected: nuisance}
+      - {t: 10.5, tag: PSV-205-OPEN, expected: safety_critical}
+      - {t: 12.0, tag: AT-310-HI, expected: safety_critical}
+      - {t: 13.0, tag: LSH-305, expected: nuisance}
+  - id: feed_pump_trip
+    title: "Duty feed pump trips while the standby is out for maintenance"
+    oplog:
+      - "06:40 Maintenance: P-102 standby feed pump isolated for seal replacement until 14:00"
+    events:
+      - {t: 0.0, tag: TI-108-DEV, expected: nuisance}
+      - {t: 2.0, tag: MS-101-TRIP, expected: actionable}
+      - {t: 3.0, tag: FI-101-LO, expected: duplicate_of_active}
+      - {t: 3.5, tag: PI-101-LO, expected: duplicate_of_active}
+      - {t: 5.0, tag: LSH-305, expected: nuisance}
+      - {t: 6.0, tag: TI-201-LO, expected: duplicate_of_active}
+      - {t: 7.5, tag: LI-201-LO, expected: duplicate_of_active}
+      - {t: 9.0, tag: LSH-305, expected: nuisance}

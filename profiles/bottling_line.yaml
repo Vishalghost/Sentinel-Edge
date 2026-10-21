@@ -1,0 +1,69 @@
+profile_id: bottling_line
+display_name: "PET Bottling Line 2"
+industry: "Food & beverage packaging"
+description: >
+  High-speed juice bottling: a pasteuriser heats product, a rotary filler fills
+  bottles, a capper seals them, and a checkweigher and labeller finish the line.
+  Product temperature in the pasteuriser is a food-safety critical control point.
+
+areas:
+  ZONE-A: "Pasteurisation"
+  ZONE-B: "Filling & Capping"
+  ZONE-C: "Inspection & Packing"
+
+equipment:
+  PAST-01: {type: "flash pasteuriser", area: ZONE-A, feeds: [BUF-01]}
+  BUF-01:  {type: "product buffer tank", area: ZONE-A, feeds: [FIL-02]}
+  FIL-02:  {type: "rotary filler", area: ZONE-B, feeds: [CAP-03]}
+  CAP-03:  {type: "capper", area: ZONE-B, feeds: [CHK-04]}
+  CHK-04:  {type: "checkweigher", area: ZONE-C, feeds: [LAB-05]}
+  LAB-05:  {type: "labeller", area: ZONE-C, feeds: [PAL-06]}
+  PAL-06:  {type: "palletiser", area: ZONE-C, feeds: []}
+  CIP-01:  {type: "clean-in-place skid", area: ZONE-A, feeds: [PAST-01]}
+  GD-01:   {type: "machine guard door, filler", area: ZONE-B, feeds: []}
+
+alarm_catalog:
+  TT-PAST-LO:  {equipment: PAST-01, priority: critical, text: "Pasteuriser hold-tube temperature below 72 C (food-safety CCP)"}
+  FDV-DIVERT:  {equipment: PAST-01, priority: high, text: "Flow diversion valve diverting product"}
+  LT-BUF-LO:   {equipment: BUF-01, priority: medium, text: "Product buffer tank level low"}
+  FIL-STARVED: {equipment: FIL-02, priority: medium, text: "Filler starved - no product supply"}
+  FIL-JAM:     {equipment: FIL-02, priority: high, text: "Filler infeed star-wheel jam"}
+  CAP-TORQUE:  {equipment: CAP-03, priority: medium, text: "Capper torque out of tolerance on head 7"}
+  CHK-UNDER:   {equipment: CHK-04, priority: medium, text: "Checkweigher reject rate above 5% (underweight)"}
+  LAB-GAP:     {equipment: LAB-05, priority: low, text: "Labeller bottle gap detected", chattering: true}
+  PAL-IDLE:    {equipment: PAL-06, priority: low, text: "Palletiser waiting for cases"}
+  CIP-COND:    {equipment: CIP-01, priority: low, text: "CIP return conductivity deviation"}
+  GD-OPEN:     {equipment: GD-01, priority: critical, text: "Filler guard door opened while machine running"}
+
+decision:
+  signals:
+    danger: "Does the NEW alarm itself signal an immediate hazard to people or to food safety, such as an open machine guard on a running machine or under-pasteurised product?"
+    consequence: "Is the NEW alarm most likely a downstream consequence of an alarm that is ALREADY ACTIVE on the same or connected equipment?"
+    noise: "Is the NEW alarm a chattering or nuisance alarm that repeats without any real process change?"
+    maintenance: "According to the operator log, is the equipment of the NEW alarm isolated, being cleaned or under maintenance right now?"
+
+scenarios:
+  - id: pasteuriser_underheat
+    title: "Pasteuriser loses temperature -> diversion starves the whole line"
+    oplog:
+      - "05:50 Sanitation: CIP-01 running caustic wash on the old line, expect conductivity alarms until 07:00"
+    events:
+      - {t: 0.0, tag: LAB-GAP, expected: nuisance}
+      - {t: 1.0, tag: CIP-COND, expected: nuisance}
+      - {t: 2.5, tag: TT-PAST-LO, expected: safety_critical}
+      - {t: 3.5, tag: FDV-DIVERT, expected: duplicate_of_active}
+      - {t: 5.0, tag: LT-BUF-LO, expected: duplicate_of_active}
+      - {t: 6.0, tag: LAB-GAP, expected: nuisance}
+      - {t: 7.0, tag: FIL-STARVED, expected: duplicate_of_active}
+      - {t: 9.0, tag: PAL-IDLE, expected: duplicate_of_active}
+      - {t: 10.0, tag: LAB-GAP, expected: nuisance}
+  - id: filler_jam_guard
+    title: "Filler jams, then someone opens the guard to clear it"
+    oplog: []
+    events:
+      - {t: 0.0, tag: LAB-GAP, expected: nuisance}
+      - {t: 1.5, tag: FIL-JAM, expected: actionable}
+      - {t: 3.0, tag: CHK-UNDER, expected: duplicate_of_active}
+      - {t: 4.0, tag: LAB-GAP, expected: nuisance}
+      - {t: 5.0, tag: GD-OPEN, expected: safety_critical}
+      - {t: 6.5, tag: CAP-TORQUE, expected: actionable}
