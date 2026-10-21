@@ -110,7 +110,7 @@ The same edge agent runs as a small Fargate container that asks a **hosted** Dec
 # after the first deploy (outputs DeciderApiKeySecret and EdgeCloudCertSecret):
 aws secretsmanager put-secret-value --secret-id <DeciderApiKeySecret> --secret-string "<your key>"
 python scripts/provision_edge.py --thing edge-cloud --secret <EdgeCloudCertSecret>
-cd infra && npx aws-cdk@latest deploy -c cloud_edge=1      # optional: -c decider_rpm=10 -c decider_max_chars=4000
+cd infra && npx aws-cdk@latest deploy -c cloud_edge=1      # optional: -c decider_rpm=9 -c decider_max_chars=4000
 ```
 
 The free tier is metered (2,000 answers a month, 1 per question, so 4 per alarm), so the core reserves a run's answers in DynamoDB before it starts (`DECIDER_MONTHLY_ANSWERS`, default 1,800) and caps cloud runs per day (`CLOUD_DAILY_RUN_CAP`, default 8). When the budget is spent, the dashboard keeps showing the most recent recorded run. The client paces requests (`STRANDS_DECIDER_RPM`), allows one request at a time, retries 429s, and checks health with `GET /v1/models`, which spends no answers.

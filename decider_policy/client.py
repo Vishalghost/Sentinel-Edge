@@ -91,13 +91,14 @@ class DeciderClient:
                 except urllib.error.HTTPError as e:
                     detail = e.read()[:300]
                     if e.code == 429 and attempt < self.retries:  # rate limited: back off and retry
-                        time.sleep(float(e.headers.get("Retry-After") or 2 ** (attempt + 1)))
+                        retry_after = e.headers.get("Retry-After") or ""
+                        time.sleep(float(retry_after) if retry_after.isdigit() else 2 ** (attempt + 1))
                         continue
-                    if e.code in (401, 402, 403, 429):  # bad key, quota exhausted, or still limited
-                        raise DeciderUnavailable(f"Decider refused the request: {e.code} {detail!r}") from e
                     if e.code >= 500 and attempt < self.retries:
                         time.sleep(2 ** attempt)
                         continue
+                    if e.code in (401, 402, 403, 429) or e.code >= 500:  # bad key, quota, still limited, still busy
+                        raise DeciderUnavailable(f"Decider refused the request: {e.code} {detail!r}") from e
                     raise ValueError(f"Decider rejected the request: {e.code} {detail!r}") from e
                 except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
                     raise DeciderUnavailable(f"Decider not reachable at {self.url}: {e}") from e
@@ -129,7 +130,7 @@ class DeciderClient:
         if self.metered:
             req = urllib.request.Request(self.url.rstrip("/") + "/v1/models", headers=self._headers())
             try:
-                with urllib.request.urlopen(req, timeout=15) as r:
+                with urllib.request.urlopen(req, timeout=15) as r:  # unpaced: rpm default leaves 1/min for this
                     return r.status == 200
             except (urllib.error.URLError, TimeoutError, ConnectionError):
                 return False

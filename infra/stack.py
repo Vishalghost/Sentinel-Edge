@@ -157,7 +157,7 @@ class AlarmTriageStack(Stack):
             actions=["iot:Publish"], resources=[f"{topic}/plants/*/{k}" for k in ("alarms", "oplog", "control")]))
 
         # ---------- cloud edge: the same edge agent on Fargate, deciding via the hosted Decider API ----------
-        # Both secrets start empty; fill them, then deploy with -c cloud_edge=1 (see README).
+        # Both secrets start as random placeholders; fill them, then deploy with -c cloud_edge=1 (see README).
         api_key = secretsmanager.Secret(self, "DeciderApiKey", description="Hosted Strands Decider API key",
                                         removal_policy=RemovalPolicy.DESTROY)
         edge_cert = secretsmanager.Secret(self, "EdgeCloudCert", description="X.509 cert + key for the cloud edge",
@@ -176,7 +176,8 @@ class AlarmTriageStack(Stack):
             logging=ecs.LogDrivers.aws_logs(stream_prefix="cloud-edge", log_retention=logs.RetentionDays.ONE_WEEK),
         )
         ecs.FargateService(self, "CloudEdge", cluster=cluster, task_definition=edge_task, desired_count=cloud_edge,
-                           assign_public_ip=True, min_healthy_percent=0,  # one connection per client id: no overlap
+                           assign_public_ip=True, min_healthy_percent=0, max_healthy_percent=100,  # one client id: no overlap
+                           circuit_breaker=ecs.DeploymentCircuitBreaker(rollback=True),  # bad key: fail fast, not hang
                            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC))
 
         CfnOutput(self, "DeciderApiKeySecret", value=api_key.secret_arn)

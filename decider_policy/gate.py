@@ -13,11 +13,14 @@ Two layers, reuse either one:
 """
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import asdict, dataclass
 from typing import Any, Callable
 
 from .client import DeciderClient, DeciderUnavailable
+
+log = logging.getLogger(__name__)
 
 Signals = dict[str, float]  # signal name -> P(yes)
 ClassifyFn = Callable[[Signals], tuple[str, float]]  # -> (category, confidence)
@@ -83,7 +86,9 @@ class PolicyGate:
                 signals.update({k: float(v["noul"]) for k, v in resp["answers"].items()})
                 latency += float(resp.get("latency_ms") or resp.get("_wall_ms") or 0.0)  # excludes rate-limit waits
                 model = resp.get("model", model)
-        except DeciderUnavailable:
+        except Exception as e:  # any Decider failure (down, busy, malformed answer) goes to a human, never dropped
+            if not isinstance(e, DeciderUnavailable):
+                log.exception("Decider failed unexpectedly; routing to %s", self.fallback_route)
             return PolicyDecision("unclassified", 0.0, {}, self.fallback_route, 0.0, "none", degraded=True)
         category, confidence = self.classify(signals)
         latency = latency or (time.perf_counter() - t0) * 1000

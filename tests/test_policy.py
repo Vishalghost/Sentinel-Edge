@@ -66,6 +66,19 @@ def test_gate_fails_toward_a_human_when_decider_is_down():
     assert d.degraded and d.route == "review"
 
 
+@pytest.mark.parametrize("resp", [ValueError("503 busy"), {"oops": 1}, {"answers": {"danger": {"noul": "n/a"}}}])
+def test_gate_fails_toward_a_human_on_any_decider_error(resp):
+    class Broken:
+        def ask(self, state, questions):
+            if isinstance(resp, Exception):
+                raise resp
+            return resp
+
+    gate = PolicyGate({"danger": "?"}, classify=lambda s: ("x", 1.0), route=lambda c, s: "suppress", client=Broken())
+    d = gate.decide("state")
+    assert d.degraded and d.route == "review"
+
+
 def test_scoped_signals_each_get_their_own_state():
     client = FakeClient(sig())
     profile = load_all()["process_plant"]

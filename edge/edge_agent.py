@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import queue
+import signal
 import tempfile
 import statistics
 import sys
@@ -136,6 +137,13 @@ def main() -> None:
         (certs / "edge.private.key").write_text(os.environ["EDGE_KEY_PEM"])
         (certs / "edge.private.key").chmod(0o600)
     ca = certs / "AmazonRootCA1.pem"
+
+    def on_resumed(connection, return_code, session_present, **_):
+        # clean_session=True: the broker forgot our subscriptions, so restore them or the edge goes deaf
+        log.info("connection resumed (session_present=%s)", session_present)
+        if not session_present:
+            connection.resubscribe_existing_topics()
+
     conn = mqtt_connection_builder.mtls_from_path(
         endpoint=args.endpoint,
         cert_filepath=str(certs / "edge.cert.pem"),
@@ -145,7 +153,7 @@ def main() -> None:
         clean_session=True,
         keep_alive_secs=30,
         on_connection_interrupted=lambda *a, **k: log.warning("connection interrupted, SDK will retry"),
-        on_connection_resumed=lambda *a, **k: log.info("connection resumed"),
+        on_connection_resumed=on_resumed,
     )
     agent = EdgeAgent(conn, args.edge_id, client)
     conn.connect().result()
@@ -155,6 +163,11 @@ def main() -> None:
         fut.result()
     threading.Thread(target=agent.worker, daemon=True).start()
     threading.Thread(target=agent.heartbeat, daemon=True).start()
+
+    def on_sigterm(*_):  # ECS stops tasks with SIGTERM: take the same clean offline path as Ctrl+C
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, on_sigterm)
     try:
         while True:
             time.sleep(1)
