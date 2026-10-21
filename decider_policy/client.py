@@ -25,9 +25,22 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
-DEFAULT_URL = os.environ.get("STRANDS_DECIDER_URL") or os.environ.get("DECIDER_URL") or "http://127.0.0.1:8099"
+
+def _load_dotenv(path: Path = Path(__file__).resolve().parent.parent / ".env") -> None:
+    """Fill unset variables from the repo's .env (git- and docker-ignored). Real env vars always win."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        key, sep, value = line.strip().partition("=")
+        if sep and key and not key.startswith("#") and value.strip():
+            os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
+
+_load_dotenv()
+DEFAULT_URL =os.environ.get("STRANDS_DECIDER_URL") or os.environ.get("DECIDER_URL") or "http://127.0.0.1:8099"
 
 
 class DeciderUnavailable(RuntimeError):

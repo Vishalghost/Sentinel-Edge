@@ -108,7 +108,8 @@ The same edge agent runs as a small Fargate container that asks a **hosted** Dec
 
 ```bash
 # after the first deploy (outputs DeciderApiKeySecret and EdgeCloudCertSecret):
-aws secretsmanager put-secret-value --secret-id <DeciderApiKeySecret> --secret-string "<your key>"
+cp .env.example .env                  # paste STRANDS_DECIDER_URL and STRANDS_DECIDER_API_KEY (git- and docker-ignored)
+python scripts/set_decider_key.py     # checks the key, then writes it to DeciderApiKeySecret
 python scripts/provision_edge.py --thing edge-cloud --secret <EdgeCloudCertSecret>
 cd infra && npx aws-cdk@latest deploy -c cloud_edge=1      # optional: -c decider_rpm=9 -c decider_max_chars=4000
 ```
