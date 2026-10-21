@@ -43,7 +43,9 @@ All plant knowledge (equipment, how it connects, the alarm catalog, and labelled
 
 Accuracy came out equal, but the mistakes differed. The LLM over-escalates: it calls downstream consequences "actionable", which is exactly the flood the operator is trying to escape. Decider's misses land in "review" because of an asymmetric router: uncertain danger is never suppressed, and if Decider is down, everything goes to a human. In this run the gated agent made 78% fewer LLM calls and used 92% fewer tokens, and the per-alarm decision costs nothing on hardware the plant already owns.
 
-**5. Keep the policy in code.** Decider measures; Python decides. Thresholds sit in a reviewable file, are covered by unit tests, and can be overridden per plant in YAML. For anything near safety, that separation matters more than a few points of accuracy.
+**5. Low confidence goes to a human, not the bin.** Decider returns probabilities, not verdicts, so the router has three outcomes, not two. An alarm is only suppressed when Decider is confident it's noise (≥ 0.60) or a duplicate (≥ 0.55). Any alarm whose danger signal sits in the uncertain band (0.35–0.50) is never suppressed, whatever else it looks like. Everything in between goes to **review**: the operator sees it, but no LLM is called. In the benchmark this caught the hardest case: a gas alarm at 25% LEL scored danger 0.45, just under the cut. It was mislabelled as a duplicate, yet still landed in front of the operator. If the Decider server is unreachable, the gate fails toward review too, so an outage can never silence the alarm board.
+
+**6. Keep the policy in code.** Decider measures; Python decides. Thresholds sit in a reviewable file, are covered by unit tests, and can be overridden per plant in YAML. For anything near safety, that separation matters more than a few points of accuracy.
 
 ## The reusable pattern
 

@@ -51,9 +51,11 @@ The two arms make *different* mistakes: the LLM over-escalates (duplicates → a
 
 Small models answer the question the context suggests. Scoping the state per signal was the single biggest improvement. See [`decider_policy/README.md`](decider_policy/README.md).
 
-## The reusable pattern
+## ⭐ Reusable Strands Decider 2B decision pattern: PolicyGate (`#policy`)
 
-[`decider_policy/`](decider_policy/) is industry-agnostic and has its own recipe: `PolicyGate` (typed yes/no signals → your `classify` → your `route`) plus `PolicyGateIntervention`, a Strands `InterventionHandler` that returns `Deny` in `before_invocation`, so the LLM is never called for suppressed requests.
+**→ [`decider_policy/README.md`](decider_policy/README.md)**: the typed questions and option sets, the wiring into the agent's path (a Strands `InterventionHandler`), and how to use it in your own agent.
+
+[`decider_policy/`](decider_policy/) is industry-agnostic: `PolicyGate` (typed yes/no signals → your `classify` → your `route`) plus `PolicyGateIntervention`, a Strands `InterventionHandler` that returns `Deny` in `before_invocation`, so the LLM is never called for suppressed requests.
 
 ## Plug-and-play industries
 
@@ -118,3 +120,4 @@ python -m pytest -q
 ## Limits
 
 49 labelled alarms is a small evaluation, and the thresholds were tuned on one plant. Decider 2B is an experimental model, so treat this as a working prototype, not a safety system: alarm suppression in a real plant needs a formal alarm-management review (ISA-18.2 / IEC 62682).
+Copyright 2026 the Alarm Flood Triage authors. Licensed under the Apache License, Version 2.0 (see LICENSE).

@@ -1,4 +1,13 @@
-# Recipe: Decider PolicyGate (`#policy`)
+# Reusable Strands Decider 2B decision pattern: PolicyGate (`#policy`)
+
+| | |
+|---|---|
+| **Pattern** | Policy: classify an incoming request before the agent acts on it |
+| **Typed questions** | N `noul` (yes/no) signals, grouped by context scope, one Decider request per scope |
+| **Option sets** | categories `safety_critical / actionable / duplicate_of_active / nuisance` → routes `escalate / review / suppress` |
+| **Wiring** | `PolicyGateIntervention`, a Strands `InterventionHandler` (`before_invocation` → `Deny` skips the LLM) |
+| **Low confidence** | anything uncertain routes to `review` (a human), never `suppress`; Decider unavailable → `review` |
+| **License** | Apache-2.0 |
 
 **Classify an incoming request with Strands Decider 2B *before* your agent acts on it, and skip the LLM entirely when it doesn't need one.**
 
