@@ -15,16 +15,19 @@ from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_lambda_event_sources as sources
 from aws_cdk import aws_logs as logs
 from aws_cdk import aws_s3 as s3
+from aws_cdk import aws_secretsmanager as secretsmanager
 from aws_cdk import aws_sqs as sqs
 from constructs import Construct
 
 REPO = str(Path(__file__).resolve().parent.parent)
 EDGE_POLICY = "alarm-triage-edge"
 EDGE_THING = "edge-laptop"
+CLOUD_EDGE_THING = "edge-cloud"
 
 
 class AlarmTriageStack(Stack):
-    def __init__(self, scope: Construct, cid: str, *, iot_endpoint: str, model_id: str, passcode: str, **kw):
+    def __init__(self, scope: Construct, cid: str, *, iot_endpoint: str, model_id: str, passcode: str,
+                 decider_url: str, decider_rpm: str, decider_max_chars: str, cloud_edge: int, **kw):
         super().__init__(scope, cid, **kw)
         acct, region = self.account, self.region
 
@@ -95,6 +98,7 @@ class AlarmTriageStack(Stack):
             ],
         })
         iot.CfnThing(self, "EdgeThing", thing_name=EDGE_THING)
+        iot.CfnThing(self, "CloudEdgeThing", thing_name=CLOUD_EDGE_THING)
 
         rule_errors = logs.LogGroup(self, "IotRuleErrors", retention=logs.RetentionDays.ONE_WEEK,
                                     removal_policy=RemovalPolicy.DESTROY)
@@ -152,6 +156,31 @@ class AlarmTriageStack(Stack):
         role.add_to_principal_policy(iam.PolicyStatement(
             actions=["iot:Publish"], resources=[f"{topic}/plants/*/{k}" for k in ("alarms", "oplog", "control")]))
 
+        # ---------- cloud edge: the same edge agent on Fargate, deciding via the hosted Decider API ----------
+        # Both secrets start empty; fill them, then deploy with -c cloud_edge=1 (see README).
+        api_key = secretsmanager.Secret(self, "DeciderApiKey", description="Hosted Strands Decider API key",
+                                        removal_policy=RemovalPolicy.DESTROY)
+        edge_cert = secretsmanager.Secret(self, "EdgeCloudCert", description="X.509 cert + key for the cloud edge",
+                                          removal_policy=RemovalPolicy.DESTROY)
+        edge_task = ecs.FargateTaskDefinition(self, "CloudEdgeTask", cpu=256, memory_limit_mib=512)
+        edge_task.add_container(
+            "edge",
+            image=ecs.ContainerImage.from_asset(REPO, file="edge/Dockerfile", platform=ecr_assets.Platform.LINUX_AMD64),
+            environment={"IOT_ENDPOINT": iot_endpoint, "EDGE_ID": CLOUD_EDGE_THING, "STRANDS_DECIDER_URL": decider_url,
+                         "STRANDS_DECIDER_RPM": decider_rpm, "STRANDS_DECIDER_MAX_CHARS": decider_max_chars},
+            secrets={
+                "STRANDS_DECIDER_API_KEY": ecs.Secret.from_secrets_manager(api_key),
+                "EDGE_CERT_PEM": ecs.Secret.from_secrets_manager(edge_cert, "cert"),
+                "EDGE_KEY_PEM": ecs.Secret.from_secrets_manager(edge_cert, "key"),
+            },
+            logging=ecs.LogDrivers.aws_logs(stream_prefix="cloud-edge", log_retention=logs.RetentionDays.ONE_WEEK),
+        )
+        ecs.FargateService(self, "CloudEdge", cluster=cluster, task_definition=edge_task, desired_count=cloud_edge,
+                           assign_public_ip=True, min_healthy_percent=0,  # one connection per client id: no overlap
+                           vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC))
+
+        CfnOutput(self, "DeciderApiKeySecret", value=api_key.secret_arn)
+        CfnOutput(self, "EdgeCloudCertSecret", value=edge_cert.secret_arn)
         CfnOutput(self, "DashboardUrl", value=f"http://{svc.load_balancer.load_balancer_dns_name}")
         CfnOutput(self, "IotEndpoint", value=iot_endpoint)
         CfnOutput(self, "EdgePolicyName", value=EDGE_POLICY)

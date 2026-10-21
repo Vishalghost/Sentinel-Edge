@@ -1,6 +1,8 @@
 """Triage engine: one PolicyGate + one PlantState per plant. Used by the edge agent and the benchmark."""
 from __future__ import annotations
 
+import json
+import os
 import time
 
 from decider_policy import DeciderClient, PolicyDecision, PolicyGate
@@ -26,8 +28,16 @@ class PlantTriage:
             scopes={**SIGNAL_SCOPES, **profile.decision.get("scopes", {})},
         )
 
+        self.max_chars = self._budgets(int(os.environ.get("STRANDS_DECIDER_MAX_CHARS", "0")))
+
+    def _budgets(self, limit: int) -> dict[str, int] | None:
+        """Per-scope state budget = request limit - that scope's questions - JSON overhead."""
+        if not limit:
+            return None
+        return {scope: max(200, limit - len(json.dumps(qs)) - 80) for scope, qs in self.gate.requests.items()}
+
     def decide(self, alarm: dict) -> tuple[PolicyDecision, dict[str, str]]:
-        states = self.state.build(alarm)
+        states = self.state.build(alarm, self.max_chars)
         d = self.gate.decide(states)
         self.state.record(alarm, d.category if not d.degraded else "unclassified")
         return d, states

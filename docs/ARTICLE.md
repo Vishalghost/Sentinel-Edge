@@ -1,6 +1,11 @@
-# Sentinel Edge: taming factory alarm floods with Strands Decider 2B
+<!-- Builder Center form fields
+Title (<=255): Sentinel Edge: taming factory alarm floods with Strands Decider 2B at the edge and Amazon Bedrock in the core
+Description (<=512): Sentinel Edge triages every factory alarm at the edge with Strands Decider 2B (four yes/no signals, under a second) and calls Amazon Bedrock only for real incidents. On 49 labelled alarms across three industries it matched an LLM-only agent's accuracy, hid zero real alarms, and made 78% fewer LLM calls.
+Tags: strands-decider-2b, policy, amazon-bedrock, strands-agents, aws-iot
+Cover: 1200x675, no text
+-->
 
-*Tags: #strands-decider-2b #policy*
+# Sentinel Edge: taming factory alarm floods with Strands Decider 2B
 
 ## The problem: forty alarms, one that matters
 
@@ -12,8 +17,9 @@ An LLM could read every alarm and sort them. But a plant raises thousands of ala
 
 **Sentinel Edge** is an alarm-flood triage agent. It splits the work in two:
 
-- **Edge (a laptop standing in for a factory edge box):** Strands Decider 2B runs locally on an RTX 4050. An edge agent receives each alarm over MQTT from AWS IoT Core, asks Decider about it, routes it, and publishes the decision back. The connection is outbound only, with an X.509 certificate and no open ports, the way OT networks are segmented in practice.
+- **Edge (a laptop GPU standing in for a factory edge box, or a cloud edge on the hosted Decider API):** Strands Decider 2B runs locally on an RTX 4050. An edge agent receives each alarm over MQTT from AWS IoT Core, asks Decider about it, routes it, and publishes the decision back. The connection is outbound only, with an X.509 certificate and no open ports, the way OT networks are segmented in practice.
 - **Core (AWS):** IoT Rules write every decision to DynamoDB and send escalated alarms to SQS. A Lambda groups a cascade into one incident and asks a Strands agent on Amazon Bedrock for the root cause and next steps. A Fargate dashboard shows the stream, the incidents, and a chat with the agent.
+- **Two edges, one owner per run:** when my laptop is online the core sends each alarm flood to its GPU; when it is off, runs go to a small Fargate container that asks the AWS User Group Madurai hosted Decider API instead. The core stamps every alarm with the edge that owns the run, so an alarm is never decided twice, and a monthly answer budget (reserved atomically in DynamoDB) keeps the free tier from running out mid-judging.
 
 All plant knowledge (equipment, how it connects, the alarm catalog, and labelled scenarios) lives in YAML profiles. I shipped three industries: a chemical process plant, a juice bottling line, and an automotive weld cell.
 
@@ -43,7 +49,7 @@ All plant knowledge (equipment, how it connects, the alarm catalog, and labelled
 
 Accuracy came out equal, but the mistakes differed. The LLM over-escalates: it calls downstream consequences "actionable", which is exactly the flood the operator is trying to escape. Decider's misses land in "review" because of an asymmetric router: uncertain danger is never suppressed, and if Decider is down, everything goes to a human. In this run the gated agent made 78% fewer LLM calls and used 92% fewer tokens, and the per-alarm decision costs nothing on hardware the plant already owns.
 
-**5. Low confidence goes to a human, not the bin.** Decider returns probabilities, not verdicts, so the router has three outcomes, not two. An alarm is only suppressed when Decider is confident it's noise (≥ 0.60) or a duplicate (≥ 0.55). Any alarm whose danger signal sits in the uncertain band (0.35–0.50) is never suppressed, whatever else it looks like. Everything in between goes to **review**: the operator sees it, but no LLM is called. In the benchmark this caught the hardest case: a gas alarm at 25% LEL scored danger 0.45, just under the cut. It was mislabelled as a duplicate, yet still landed in front of the operator. If the Decider server is unreachable, the gate fails toward review too, so an outage can never silence the alarm board.
+**5. Low confidence goes to a human, not the bin.** Decider returns probabilities, not verdicts, so the router has three outcomes, not two. An alarm is only suppressed when Decider is confident it's noise (>= 0.60) or a duplicate (>= 0.55). Any alarm whose danger signal sits in the uncertain band (0.35-0.50) is never suppressed, whatever else it looks like. Everything in between goes to **review**: the operator sees it, but no LLM is called. In the benchmark this caught the hardest case: a gas alarm at 25% LEL scored danger 0.45, just under the cut. It was mislabelled as a duplicate, yet still landed in front of the operator. If the Decider server is unreachable, the gate fails toward review too, so an outage can never silence the alarm board.
 
 **6. Keep the policy in code.** Decider measures; Python decides. Thresholds sit in a reviewable file, are covered by unit tests, and can be overridden per plant in YAML. For anything near safety, that separation matters more than a few points of accuracy.
 
@@ -60,4 +66,6 @@ Swap the signals and the two functions, and it triages support tickets, log line
 
 49 labelled alarms is a small evaluation, and Decider 2B is explicitly experimental. This is a prototype of an idea, not a safety system: suppressing alarms in a real plant requires a formal alarm-management review. The next steps I'd take are more labelled data per industry, moving the agent onto Bedrock AgentCore Runtime, and installing the optimized kernels that the server warned it was missing, to bring the laptop latency down.
 
-**Repo:** _(link)_ · **Demo video:** _(link)_
+**Repo:** _(link)_ | **Demo video:** _(link)_ | Strands Decider: https://github.com/strands-labs/strands-decider | #strands-decider-2b #policy
+
+Hosted Decider API courtesy of the AWS User Group Madurai.

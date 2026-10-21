@@ -4,7 +4,10 @@ Outbound-only MQTT/TLS to AWS IoT Core with an X.509 certificate -- no inbound p
   subscribes  plants/+/alarms   plants/+/oplog   plants/+/control
   publishes   plants/{plant}/decisions           edge/{edge_id}/status (heartbeat)
 
-    python -m edge.edge_agent --endpoint xxxx-ats.iot.us-east-1.amazonaws.com
+The same code runs as two kinds of edge (the core assigns each run to exactly one):
+  laptop GPU   python -m edge.edge_agent --endpoint xxxx-ats.iot.us-east-1.amazonaws.com
+  cloud        container on Fargate, Decider = hosted API (STRANDS_DECIDER_API_KEY set),
+               certificate from EDGE_CERT_PEM / EDGE_KEY_PEM
 """
 from __future__ import annotations
 
@@ -13,6 +16,7 @@ import json
 import logging
 import os
 import queue
+import tempfile
 import statistics
 import sys
 import threading
@@ -30,6 +34,7 @@ from decider_policy import DeciderClient  # noqa: E402
 
 log = logging.getLogger("edge")
 HEARTBEAT_S = 5
+METERED_HEALTH_EVERY_S = 120  # even a free health GET counts against a hosted rate limit
 
 
 class EdgeAgent:
@@ -42,6 +47,9 @@ class EdgeAgent:
         self.inbox: queue.Queue = queue.Queue()
         self.latencies: deque = deque(maxlen=100)
         self.decisions = 0
+        self.kind = "api" if client.metered else "gpu"
+        self.decider_ok = True
+        self._last_health = 0.0
         self.stop = threading.Event()
 
     # MQTT callbacks run on the SDK's thread: only enqueue there, decide on our worker.
@@ -75,7 +83,11 @@ class EdgeAgent:
             triage.state.add_oplog(msg["note"])
             log.info("[%s] oplog: %s", plant_id, msg["note"])
         elif kind == "alarms":
+            target = msg.get("edge_target")
+            if target and target != self.edge_id:
+                return  # the core assigned this run to another edge: never decide twice
             d, _ = triage.decide(msg)
+            self.decider_ok = not d.degraded
             out = decision_message(msg, d, self.edge_id)
             self.conn.publish(topic=f"plants/{plant_id}/decisions", payload=json.dumps(out), qos=mqtt.QoS.AT_LEAST_ONCE)
             self.decisions += 1
@@ -86,14 +98,19 @@ class EdgeAgent:
     def heartbeat(self) -> None:
         while not self.stop.wait(HEARTBEAT_S):
             lat = list(self.latencies)
+            if not self.client.metered or time.time() - self._last_health > METERED_HEALTH_EVERY_S:
+                self.decider_ok = self.client.health()
+                self._last_health = time.time()
             status = {
                 "plant_id": "__edge__",
                 "sk": self.edge_id,
                 "edge_id": self.edge_id,
                 "online": True,
-                "decider_ok": self.client.health(),
-                "gpu": os.environ.get("EDGE_GPU", "local GPU"),
+                "decider_ok": self.decider_ok,
+                "kind": self.kind,
+                "gpu": os.environ.get("EDGE_GPU", "hosted Decider API" if self.kind == "api" else "local GPU"),
                 "decisions_total": self.decisions,
+                "answers_used": self.client.answers,
                 "p50_ms": round(statistics.median(lat), 1) if lat else None,
                 "ts": time.time(),
             }
@@ -113,11 +130,17 @@ def main() -> None:
         sys.exit(f"Decider is not answering at {client.url}. Start it first: bash .serve.sh")
 
     certs = Path(args.cert_dir)
+    if os.environ.get("EDGE_CERT_PEM"):  # container: certificate injected from Secrets Manager
+        certs = Path(tempfile.mkdtemp(prefix="edge-cert-"))
+        (certs / "edge.cert.pem").write_text(os.environ["EDGE_CERT_PEM"])
+        (certs / "edge.private.key").write_text(os.environ["EDGE_KEY_PEM"])
+        (certs / "edge.private.key").chmod(0o600)
+    ca = certs / "AmazonRootCA1.pem"
     conn = mqtt_connection_builder.mtls_from_path(
         endpoint=args.endpoint,
         cert_filepath=str(certs / "edge.cert.pem"),
         pri_key_filepath=str(certs / "edge.private.key"),
-        ca_filepath=str(certs / "AmazonRootCA1.pem"),
+        ca_filepath=str(ca) if ca.exists() else None,  # else the system trust store (has Amazon Root CA 1)
         client_id=args.edge_id,
         clean_session=True,
         keep_alive_secs=30,

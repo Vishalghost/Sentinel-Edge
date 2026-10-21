@@ -9,3 +9,6 @@ spike
 bench/results
 certs
 *.drawio
+cloudnexus-decider-hackathon-kit
+.env
+.env.*

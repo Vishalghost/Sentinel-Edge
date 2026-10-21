@@ -57,8 +57,13 @@ class PlantState:
         lines.append(f"  entries naming {eq}: " + (" | ".join(mentions) if mentions else "none"))
         return lines
 
-    def build(self, alarm: dict) -> dict[str, str]:
-        """Return {scope: state text} for one new alarm."""
+    def build(self, alarm: dict, max_chars: dict[str, int] | None = None) -> dict[str, str]:
+        """Return {scope: state text} for one new alarm.
+
+        max_chars: optional per-scope character budget (hosted Decider endpoints cap request
+        size). The full scope sheds its OLDEST active alarms first -- they matter least to a
+        new alarm -- and anything still too long is cut at the end.
+        """
         p = self.profile
         eq = alarm["equipment"]
         info = p.equipment.get(eq, {})
@@ -73,6 +78,9 @@ class PlantState:
         if downstream:
             full.append(f"  feeds: {', '.join(downstream)}")
         active = [(ts, a, c) for ts, a, c in self.recent if now - ts <= WINDOW_S]
+        budget = (max_chars or {}).get("full", 0)
+        while budget and active and self._full_len(full, active, alarm) > budget:
+            active = active[1:]
         connected = p.connected(eq)
         full.append("")
         if active:
@@ -88,8 +96,17 @@ class PlantState:
             full.append("ALREADY ACTIVE: none")
         full += self._oplog_block(alarm)
 
-        return {
+        states = {
             "alarm": "\n".join(head),
             "oplog": "\n".join(head + self._oplog_block(alarm)),
             "full": "\n".join(full),
         }
+        for scope, limit in (max_chars or {}).items():
+            if limit and len(states[scope]) > limit:
+                states[scope] = states[scope][: limit - 3] + "..."
+        return states
+
+    def _full_len(self, head: list[str], active: list, alarm: dict) -> int:
+        """Approximate length of the full scope with these active alarms (for trimming)."""
+        per_alarm = sum(len(a["text"]) + len(a["tag"]) + 60 for _, a, _ in active)
+        return sum(len(x) + 1 for x in head) + per_alarm + sum(len(x) + 1 for x in self._oplog_block(alarm)) + 40

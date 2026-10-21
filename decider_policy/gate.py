@@ -81,7 +81,7 @@ class PolicyGate:
             for scope, questions in self.requests.items():
                 resp = self.client.ask(states[scope], questions)
                 signals.update({k: float(v["noul"]) for k, v in resp["answers"].items()})
-                latency += float(resp.get("latency_ms") or 0.0)
+                latency += float(resp.get("latency_ms") or resp.get("_wall_ms") or 0.0)  # excludes rate-limit waits
                 model = resp.get("model", model)
         except DeciderUnavailable:
             return PolicyDecision("unclassified", 0.0, {}, self.fallback_route, 0.0, "none", degraded=True)

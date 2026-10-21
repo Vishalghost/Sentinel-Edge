@@ -83,6 +83,7 @@
   <select id="plant" aria-label="Plant profile"></select>
   <select id="scenario" aria-label="Scenario"></select>
   <select id="speed" aria-label="Speed"><option value="0.5">0.5&times;</option><option value="1" selected>1&times;</option><option value="2">2&times;</option></select>
+  <select id="edgesel" aria-label="Decide on"><option value="auto">Decide on: auto</option></select>
   <input id="pass" type="password" placeholder="demo passcode" hidden>
   <button id="run" class="primary">Start alarm flood</button>
   <div class="spacer"></div>
@@ -98,6 +99,7 @@
     <div class="kpi"><b id="k-p50">&ndash;</b><span>Decider p50 per alarm</span></div>
     <div class="kpi"><b id="k-llm">0</b><span>Bedrock RCA calls</span></div>
     <div class="kpi"><b id="k-acc">&ndash;</b><span>agrees with label</span></div>
+    <div class="kpi"><b id="k-budget">&ndash;</b><span>live Decider API answers left this month</span></div>
   </div>
 
   <section>
@@ -166,7 +168,7 @@ function renderAlarms(fresh) {
       <td>${sigCell(a.signals)}</td>
       <td><span class="chip c-${cls(a.category)}">${esc(String(a.category).replaceAll("_", " "))}</span><div class="sub">${ok}</div></td>
       <td class="route-cell"><span class="chip r-${cls(a.route)}">${esc(a.route)}</span></td>
-      <td class="ms">${Math.round(+a.latency_ms || 0)} ms</td></tr>`;
+      <td class="ms">${Math.round(+a.latency_ms || 0)} ms<div class="sub">${esc(a.edge_id || "")}</div></td></tr>`;
   });
   $("alarms").innerHTML = rows.join("");
 }
@@ -201,11 +203,14 @@ function renderIncidents(incs) {
 }
 
 function renderEdge(edges) {
-  const e = edges.sort((a, b) => b.ts - a.ts)[0];
-  const online = e && e.online && Date.now() / 1000 - e.ts < 20;
-  $("edge").innerHTML = `<span class="dot ${online ? "on" : ""}"></span><span>${online
-    ? `edge ${esc(e.edge_id)} online &middot; ${esc(e.gpu)} &middot; Decider ${e.decider_ok ? "ready" : "DOWN"}${e.p50_ms ? ` &middot; p50 ${Math.round(e.p50_ms)} ms` : ""}`
-    : "edge offline &mdash; start the laptop edge agent"}</span>`;
+  const live = edges.filter((e) => e.online && Date.now() / 1000 - e.ts < 20);
+  const sel = $("edgesel"), cur = sel.value;
+  sel.innerHTML = `<option value="auto">Decide on: auto</option>` + live.map((e) =>
+    `<option value="${esc(e.edge_id)}">${e.kind === "api" ? "cloud Decider API" : "laptop GPU"} (${esc(e.edge_id)})</option>`).join("");
+  if ([...sel.options].some((o) => o.value === cur)) sel.value = cur;
+  $("edge").innerHTML = live.length
+    ? live.map((e) => `<span class="dot on"></span><span>${e.kind === "api" ? "cloud API" : "laptop GPU"} ${esc(e.edge_id)}${e.decider_ok ? "" : " (Decider DOWN)"}${e.p50_ms ? ` &middot; p50 ${Math.round(e.p50_ms)} ms` : ""}</span>`).join("&nbsp;&nbsp;")
+    : `<span class="dot"></span><span>no edge online &mdash; showing the most recent recorded run</span>`;
 }
 
 async function poll() {
@@ -226,6 +231,8 @@ async function poll() {
     renderKpis(s.incidents || []);
     $("oplog").textContent = s.oplog && s.oplog.length ? "Operator log: " + s.oplog.join("  |  ") : "";
     $("run").disabled = !!s.running;
+    if (s.budget) $("k-budget").textContent = Math.max(0, s.budget.limit - s.budget.used);
+    if (s.run && s.run.edge_id) $("oplog").textContent += `${$("oplog").textContent ? "  ·  " : ""}decided by ${s.run.edge_kind === "api" ? "cloud Decider API" : "laptop GPU"} (${s.run.edge_id})`;
   } catch (e) { console.warn(e); }
 }
 
@@ -233,7 +240,7 @@ $("plant").onchange = () => { fillScenarios(); runId = null; resetView(); poll()
 $("run").onclick = async () => {
   try {
     $("run").disabled = true;
-    const r = await api("/api/runs", { method: "POST", body: JSON.stringify({ plant_id: $("plant").value, scenario_id: $("scenario").value, speed: +$("speed").value }) });
+    const r = await api("/api/runs", { method: "POST", body: JSON.stringify({ plant_id: $("plant").value, scenario_id: $("scenario").value, speed: +$("speed").value, edge: $("edgesel").value }) });
     runId = r.run_id; runStart = Date.now() / 1000; resetView();
   } catch (e) { alert(e.message); $("run").disabled = false; }
 };

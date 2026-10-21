@@ -14,3 +14,9 @@ certs/
 .probe.sh
 Untitled Diagram.drawio
 infra/cdk.context.json
+
+# third-party hackathon kit: reference only, never published or shipped
+cloudnexus-decider-hackathon-kit/
+.env
+.env.*
+!.env.example

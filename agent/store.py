@@ -90,3 +90,36 @@ def put_run(plant_id: str, run_id: str, meta: dict) -> None:
 def latest_run(plant_id: str) -> dict | None:
     items = _query_all(_incidents(), KeyConditionExpression=Key("plant_id").eq(plant_id) & Key("sk").begins_with("RUN#"))
     return max(items, key=lambda i: i.get("started", 0)) if items else None
+
+
+# ---------- hosted Decider quota (a metered API: 1 answer per question) ----------
+
+def _budget_key() -> dict:
+    return {"plant_id": "__budget__", "sk": time.strftime("MONTH#%Y-%m", time.gmtime())}
+
+
+def reserve_answers(n: int, monthly_limit: int) -> bool:
+    """Atomically reserve n answers for this calendar month; False if that would pass the limit.
+
+    A conditional update, so two judges pressing Start at the same moment can't both squeeze
+    under the limit (a read-then-write check would let both through).
+    """
+    from botocore.exceptions import ClientError
+
+    try:
+        _incidents().update_item(
+            Key=_budget_key(),
+            UpdateExpression="ADD used :n",
+            ConditionExpression="attribute_not_exists(used) OR used <= :room",
+            ExpressionAttributeValues={":n": n, ":room": monthly_limit - n},
+        )
+        return True
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            return False
+        raise
+
+
+def answers_used() -> int:
+    item = _incidents().get_item(Key=_budget_key()).get("Item")
+    return int(item["used"]) if item else 0
