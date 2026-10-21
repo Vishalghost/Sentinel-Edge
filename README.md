@@ -1,4 +1,4 @@
-# Alarm Flood Triage — decide at the edge, generate in the core
+# Sentinel Edge — alarm-flood triage that decides at the edge and generates in the core
 
 **A factory alarm agent that uses Strands Decider 2B to decide, in under a second on a laptop GPU, which alarms an operator actually needs to see, and calls Amazon Bedrock only for the few that need an explanation.**
 
@@ -120,4 +120,4 @@ python -m pytest -q
 ## Limits
 
 49 labelled alarms is a small evaluation, and the thresholds were tuned on one plant. Decider 2B is an experimental model, so treat this as a working prototype, not a safety system: alarm suppression in a real plant needs a formal alarm-management review (ISA-18.2 / IEC 62682).
-Copyright 2026 the Alarm Flood Triage authors. Licensed under the Apache License, Version 2.0 (see LICENSE).
+Copyright 2026 the Sentinel Edge authors. Licensed under the Apache License, Version 2.0 (see LICENSE).

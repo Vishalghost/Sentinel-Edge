@@ -6,7 +6,7 @@
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="&lt;b&gt;Alarm Flood Triage&lt;/b&gt; — Decide at the Edge (Strands Decider 2B), Generate in the Core (Amazon Bedrock)" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontColor=#232F3E;" vertex="1" parent="1">
+        <mxCell id="title" value="&lt;b&gt;Sentinel Edge&lt;/b&gt; — Alarm-flood triage: Decide at the Edge (Strands Decider 2B), Generate in the Core (Amazon Bedrock)" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontColor=#232F3E;" vertex="1" parent="1">
           <mxGeometry x="20" y="0" width="1100" height="40" as="geometry" />
         </mxCell>
 

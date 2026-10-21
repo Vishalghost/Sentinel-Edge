@@ -1,4 +1,4 @@
-# Decide at the edge, generate in the core: taming factory alarm floods with Strands Decider 2B
+# Sentinel Edge: taming factory alarm floods with Strands Decider 2B
 
 *Tags: #strands-decider-2b #policy*
 
@@ -10,7 +10,7 @@ An LLM could read every alarm and sort them. But a plant raises thousands of ala
 
 ## What I built
 
-**Alarm Flood Triage** splits the work in two:
+**Sentinel Edge** is an alarm-flood triage agent. It splits the work in two:
 
 - **Edge (a laptop standing in for a factory edge box):** Strands Decider 2B runs locally on an RTX 4050. An edge agent receives each alarm over MQTT from AWS IoT Core, asks Decider about it, routes it, and publishes the decision back. The connection is outbound only, with an X.509 certificate and no open ports, the way OT networks are segmented in practice.
 - **Core (AWS):** IoT Rules write every decision to DynamoDB and send escalated alarms to SQS. A Lambda groups a cascade into one incident and asks a Strands agent on Amazon Bedrock for the root cause and next steps. A Fargate dashboard shows the stream, the incidents, and a chat with the agent.

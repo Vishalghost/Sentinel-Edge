@@ -19,7 +19,7 @@ client = TestClient(main.app)
 def test_index_and_health():
     assert client.get("/health").json() == {"ok": True}
     r = client.get("/")
-    assert r.status_code == 200 and "Alarm Flood Triage" in r.text
+    assert r.status_code == 200 and "Sentinel Edge" in r.text
 
 
 def test_profiles_lists_all_three_industries():

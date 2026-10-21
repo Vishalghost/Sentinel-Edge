@@ -30,7 +30,7 @@ REGION = os.environ.get("AWS_REGION", "us-east-1")
 _iot = boto3.client("iot-data", region_name=REGION, endpoint_url=f"https://{os.environ['IOT_ENDPOINT']}") if os.environ.get("IOT_ENDPOINT") else None
 _s3 = boto3.client("s3", region_name=REGION)
 
-app = FastAPI(title="Alarm Flood Triage")
+app = FastAPI(title="Sentinel Edge")
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 _running: dict[str, asyncio.Task] = {}
 _hits: dict[str, deque] = defaultdict(lambda: deque(maxlen=500))
