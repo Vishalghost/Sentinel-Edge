@@ -20,3 +20,7 @@ cloudnexus-decider-hackathon-kit/
 .env
 .env.*
 !.env.example
+
+# local deploy outputs (account-specific)
+cdk-outputs.json
+cdk-diff.txt
